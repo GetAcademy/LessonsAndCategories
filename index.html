@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="model.js"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+        model.currentId = null;
+        // view
+        updateView();
+        function updateView() {
+            let currentContent = null;
+            let html = '';
+            for (let content of model.content) {
+                if (content.id == model.currentId) {
+                    currentContent = content;
+                }
+                if (content.parentId == model.currentId) {
+                    html += /*HTML*/`
+                    <li><a href="javascript:selectContent(${content.id})">
+                        ${content.text}    
+                        </a>
+                    </li>
+                `;
+                }
+            }
+
+            let lessionHtml = '';
+            if (currentContent != null && currentContent.isLession) {
+                lessionHtml = `<h1>Leksjon "${currentContent.text}"</h1>`;
+            }
+
+            document.getElementById('app').innerHTML =
+                createBreadcrumbs(model.currentId) + html + lessionHtml;
+        }
+
+        function createBreadcrumbs(id) {
+            let currentContent = null;
+            for (let content of model.content) {
+                if (content.id == id) {
+                    currentContent = content;
+                }
+            }
+            if (currentContent == null) return '';
+            return /*HTML*/`
+                ${createBreadcrumbs(currentContent.parentId)}
+                > 
+                <a href="javascript:selectContent(${currentContent.id})">${currentContent.text}</a>
+            `;
+        }
+
+        // controller
+        function selectContent(id) {
+            model.currentId = id;
+            updateView();
+        }
+    </script>
+</body>
+
+</html>
